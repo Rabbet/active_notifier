@@ -1,0 +1,3 @@
+class ActiveNotifier::Caller
+
+end
