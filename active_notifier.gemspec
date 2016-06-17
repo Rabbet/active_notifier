@@ -9,8 +9,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Andrew Latimer"]
   spec.email         = ["andrew@elpasoera.com"]
 
-  spec.summary       = %q{TODO: Write a short summary, because Rubygems requires one.}
-  spec.description   = %q{TODO: Write a longer description or delete this line.}
+  spec.summary       = %q{Send notifications on a consistent interface over SMS, phone calls, or anything with an ActionMailer-like interface.}
   spec.homepage      = "TODO: Put your gem's website or public repo URL here."
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
@@ -29,4 +28,11 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "bundler", "~> 1.12"
   spec.add_development_dependency "rake", "~> 10.0"
   spec.add_development_dependency "rspec", "~> 3.0"
+  spec.add_development_dependency "guard-rspec"
+
+  spec.add_dependency 'activesupport'
+  spec.add_dependency 'twilio-ruby'
+  spec.add_dependency 'redis'
+  spec.add_dependency 'activejob'
+  spec.add_dependency 'globalid'
 end

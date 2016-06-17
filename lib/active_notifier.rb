@@ -1,4 +1,6 @@
+require 'active_support'
 require "active_notifier/version"
+require 'globalid'
 
 module ActiveNotifier
   extend ActiveSupport::Autoload
@@ -10,7 +12,6 @@ module ActiveNotifier
   autoload :Caller
 
   autoload :MessageQueue
-  autoload :Serialization
 
   module Clients
     autoload :SMS, 'active_notifier/clients/sms'

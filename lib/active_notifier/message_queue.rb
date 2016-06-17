@@ -1,6 +1,8 @@
+require 'redis'
+
 class ActiveNotifier::MessageQueue
-  cattr_accesor :client
-  self.client = Redis
+  cattr_accessor :client
+  self.client = ::Redis
 
   def initialize
     @client = self.class.client.new
@@ -24,11 +26,13 @@ class ActiveNotifier::MessageQueue
   end
 
   def serialize(message)
-    "#{message.class}|#{message.event}|#{message.serialized_arguments}"
+    Marshal.dump([message.class.to_s, message.event, message.serialized_arguments])
   end
 
   def deserialize(serialized_message)
-    klass, event, *args = serialized_message.split('|')
+    return if serialized_message.nil?
+
+    klass, event, args = Marshal.load(serialized_message)
     klass = klass.constantize
     event = event.to_sym
 

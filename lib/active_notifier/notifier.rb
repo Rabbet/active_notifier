@@ -10,7 +10,7 @@ class ActiveNotifier::Notifier
 
     def method_missing(event, *args)
       if events.has_key?(event)
-        Notification.new(event, events[event], *args)
+        ActiveNotifier::Notification.new(event, events[event], *args)
       else
         super
       end

@@ -1,20 +1,34 @@
+require 'active_job/arguments'
+
 class ActiveNotifier::Messenger
-  extend Serialization
+  extend ::ActiveJob::Arguments
 
   cattr_accessor :client, :message_queue
-  cattr_reader :default_options, :event_handlers
-  attr_reader :to, :from, :body, :arguments
+  cattr_reader :default_options
+  attr_reader :event, :to, :from, :body, :arguments
 
   self.client = ActiveNotifier::Clients::SMS
   self.message_queue = ActiveNotifier::MessageQueue.new
 
   class << self
     def method_missing(method, *args)
-      if @events.has_key?(method)
+      if events.has_key?(method)
         self.new(method, *args)
       else
         super
       end
+    end
+
+    def default_options
+      @default_options ||= {}
+    end
+
+    def event_handlers
+      @event_handlers ||= {}
+    end
+
+    def response_handlers
+      @response_handlers ||= HashWithIndifferentAccess.new
     end
 
     def default(options = {})
@@ -22,13 +36,11 @@ class ActiveNotifier::Messenger
     end
 
     def event(event, &block)
-      @event_handlers ||= {}
-      @event_handlers[event] = block
+      event_handlers[event] = block
     end
 
     def on_response_to(event, &block)
-      @response_handlers ||= HashWithIndifferentAccess.new
-      @response_handlers[event] = block
+      response_handlers[event] = block
     end
   end
 
@@ -79,6 +91,6 @@ class ActiveNotifier::Messenger
   end
 
   def format_phone_number(phone_number)
-    phone_number.gsub(/\D/, '').gsub('+1', '')
+    phone_number ? phone_number.gsub(/\D/, '').gsub('+1', '') : ''
   end
 end

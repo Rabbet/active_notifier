@@ -1,3 +1,5 @@
+require 'twilio-ruby'
+
 class ActiveNotifier::Clients::SMS
   cattr_accessor :client
   self.client = Twilio::REST::Client
