@@ -5,7 +5,7 @@ class ActiveNotifier::Messenger
 
   cattr_accessor :client, :message_queue
   cattr_reader :default_options
-  attr_reader :event, :to, :from, :body, :arguments, :client, :message_queue
+  attr_reader :event, :to, :from, :body, :arguments, :client, :message_queue, :response_message
 
   self.client = ActiveNotifier::Clients::SMS
   self.message_queue = ActiveNotifier::MessageQueue
@@ -45,7 +45,7 @@ class ActiveNotifier::Messenger
 
     def process_response(phone_number, response)
       if message = message_queue.new.pop(phone_number, 'awaiting_response')
-        response_handlers[message.event].call(response, *message.arguments)
+        message.process_response(response)
       end
     end
 
@@ -95,6 +95,15 @@ class ActiveNotifier::Messenger
   end
 
   private
+  def body(message)
+    @response_message = message
+  end
+
+  def process_response(response)
+    self.class.response_handlers[@event].call(response, *@arguments)
+    return @response_message
+  end
+
   def send_sms(options)
     @client.send_message(from: @from, to: @to, body: @body)
   end

@@ -14,13 +14,13 @@ class ActiveNotifier::Notification
 
   def deliver_later(options = {})
     methods_used.each do |notification_class|
-      notification_class.send(@event, @args).deliver_later(options)
+      notification_class.send(@event, *@args).deliver_later(options)
     end
   end
 
   def deliver(options = {})
     methods_used.each do |notification_class|
-      notification_class.send(@event, @args).deliver(options)
+      notification_class.send(@event, *@args).deliver(options)
     end
   end
 
