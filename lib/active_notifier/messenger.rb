@@ -42,6 +42,16 @@ class ActiveNotifier::Messenger
     def on_response_to(event, &block)
       response_handlers[event] = block
     end
+
+    def process_response(phone_number, response)
+      if message = message_queue.new.pop(phone_number, 'awaiting_response')
+        response_handlers[message.event].call(response, *message.arguments)
+      end
+    end
+
+    def next_pending_message(phone_number)
+      message_queue.new.pop(phone_number, 'not_sent')
+    end
   end
 
   def initialize(event, *args)
@@ -78,15 +88,15 @@ class ActiveNotifier::Messenger
     self.class.serialize(@arguments)
   end
 
-  private
-  def send_sms(options)
-    @client.send_message(from: @from, to: @to, body: @body)
-  end
-
   def sms(options = {})
     @to = options[:to] unless options[:to].nil?
     @from = options[:from] unless options[:from].nil?
     @body = options[:body] unless options[:body].nil?
+  end
+
+  private
+  def send_sms(options)
+    @client.send_message(from: @from, to: @to, body: @body)
   end
 
   def queue_message(status)

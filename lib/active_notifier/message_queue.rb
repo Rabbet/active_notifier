@@ -30,16 +30,16 @@ class ActiveNotifier::MessageQueue
   end
 
   def serialize(message)
-    Marshal.dump([message.class.to_s, message.event, message.serialized_arguments])
+    Marshal.dump([message.class.to_s, message.event, message.to, message.from, message.body, message.serialized_arguments])
   end
 
   def deserialize(serialized_message)
     return if serialized_message.nil?
 
-    klass, event, args = Marshal.load(serialized_message)
+    klass, event, to, from, body, args = Marshal.load(serialized_message)
     klass = klass.constantize
     event = event.to_sym
 
-    klass.new(event, *klass.deserialize(args))
+    klass.new(event, *klass.deserialize(args)).tap { |message| message.sms(to: to, from: from, body: body) }
   end
 end

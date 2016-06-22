@@ -13,7 +13,7 @@ describe ActiveNotifier::MessageQueue do
       subject.push(message, 'awaiting_response')
 
       serialized_message = subject.client.queue['5125551234:awaiting_response'].first
-      expect(Marshal.load(serialized_message)).to eq(['ActiveNotifier::Messenger', :foo, ['a string']])
+      expect(Marshal.load(serialized_message)).to eq(['ActiveNotifier::Messenger', :foo, message.to, message.from, message.body, ['a string']])
     end
   end
 

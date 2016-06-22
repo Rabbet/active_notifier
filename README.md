@@ -106,14 +106,13 @@ UserMessenger.friend_request(user, possible_friend).deliver_later(wait_until: 10
 
 For the response functionality or phone calls to work, you'll need some web 
 server that accepts the responses. There's one built-in to ActiveNotifier for 
-Rails, but you can build your own (see ActiveNotifier::TwilioMessengerEngine and
-ActiveNotifier::TwilioCallerEngine).
+Rails, but you can build your own (see the engines directory for details).
 
 If using Rails and Twilio, just add this to your routes file:
 
 ```ruby
-mount ActiveNotifier::TwilioMessengerEngine => '/twilio_messages'
-mount ActiveNotifier::TwilioCallerEngine => '/twilio_calls'
+mount ActiveNotifier::TwilioMessenger::Engine => '/twilio_messages'
+mount ActiveNotifier::TwilioCaller::Engine => '/twilio_calls'
 ```
 
 ## Development

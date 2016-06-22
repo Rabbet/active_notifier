@@ -52,6 +52,29 @@ describe ActiveNotifier::Messenger do
     end
   end
 
+  describe '.process_response' do
+    it 'calls the on_response_to callback defined for the event' do
+      called = false
+
+      message.send(:queue_message, 'awaiting_response')
+      ActiveNotifier::Messenger.on_response_to(:foo) { |c| called = c }
+      ActiveNotifier::Messenger.process_response(to, true)
+
+      expect(called).to eq(true)
+    end
+  end
+
+  describe '.next_pending_message' do
+    it 'returns the next pending message' do
+      message.send(:queue_message, 'not_sent')
+      pending_message = ActiveNotifier::Messenger.next_pending_message(to)
+      expect(pending_message.to).to eq(message.to)
+      expect(pending_message.from).to eq(message.from)
+      expect(pending_message.body).to eq(message.body)
+      expect(pending_message.arguments).to eq(message.arguments)
+    end
+  end
+
   describe '#deliver' do
     before(:each) { ActiveNotifier::Messenger.event(:foo) { 'foo' } }
 
