@@ -1,8 +1,11 @@
 # ActiveNotifier
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/active_notifier`. To experiment with that code, run `bin/console` for an interactive prompt.
+A unified interface for sending SMS and phone calls and handling responses with
+an external API that looks a lot like ActionMailer.
 
-TODO: Delete this and the text above, and describe your gem
+There's also a Notification functionality that allows you to define all of your
+notifications for a particular event and send them all out at once, or only use
+one, depending on user preference.
 
 ## Installation
 
@@ -20,17 +23,69 @@ Or install it yourself as:
 
     $ gem install active_notifier
 
-## Usage
+## Getting Started
 
-TODO: Write usage instructions here
+Define some Messengers or Callers. These are the classes for SMS and phone
+calls, respectively.
+
+```ruby
+class UserMessenger < ActiveNotifier::Messenger
+  default from: '8005551234'
+  event :new_message do |user, person|
+    sms(to: user.phone_number, body: "#{person.name} sent you a message!")
+  end
+
+  # You can also define response handlers so your users can response directly to
+  # messages from whatever channel you sent things out on.
+  event :friend_request do |friend_request|
+    sms(to: friend_request.to.phone_number,
+        body: "#{friend_request.from.name} added you on FB4Dogs. Do you accept? YES or NO")
+  end
+
+  on_response_to :friend_request do |response, friend_request|
+    if response == 'YES'
+      friend_request.approve
+    else
+      friend_request.deny
+    end
+  end
+end
+```
+
+then set up some Notifiers
+
+```ruby
+class UserNotifier < ActiveNotifier::Notifier
+  notifies_on sms: UserMessenger, phone: UserCaller, email: UserMailer
+end
+```
+
+Then send them out!
+
+```ruby
+# only send this via SMS and email
+user.preferred_contact_methods = [:sms, :email]
+UserNotifier.friend_request(user, possible_friend).for(user).deliver_later
+```
+
+You can also use the Messengers/Callers directly via a similar interface.
+
+```ruby
+UserMessenger.friend_request(user, possible_friend).deliver_later
+```
+
+`deliver_later` uses ActiveJob under the hood, so you can pass in the familiar
+options like wait.
+
+```ruby
+UserMessenger.friend_request(user, possible_friend).deliver_later(wait_until: 10.minutes.from_now)
+```
 
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
-
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/active_notifier.
+Bug reports and pull requests are welcome on GitHub at https://github.com/RenovateSimply/active_notifier.
 

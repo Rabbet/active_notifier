@@ -5,7 +5,7 @@ describe ActiveNotifier::Notification do
     notifies_on :foo, { sms: ActiveNotifier::Messenger, messages: ActiveNotifier::Messenger }
   end
 
-  let(:user) { Struct.new(:preferred_contact_method).new(:sms) }
+  let(:user) { Struct.new(:preferred_contact_methods).new([:sms]) }
   let(:message) { ActiveNotifier::Messenger.new(:foo) }
 
   before :each do

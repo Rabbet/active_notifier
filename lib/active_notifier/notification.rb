@@ -29,7 +29,7 @@ class ActiveNotifier::Notification
     if @for.nil?
       @event_options[:methods].values
     else
-      @event_options[:methods].select { |method, _| @for.preferred_contact_method.to_sym == method }.values
+      @event_options[:methods].select { |method, _| @for.preferred_contact_methods.include? method }.values
     end
   end
 
