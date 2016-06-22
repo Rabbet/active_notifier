@@ -107,6 +107,14 @@ describe ActiveNotifier::Messenger do
     end
   end
 
+  describe '#process_event' do
+    it 'calls the events event handler' do
+      message = SampleMessenger.new(:event_without_response, 'a string')
+      message.process_event
+      expect(message.to).to eq('5125551234')
+    end
+  end
+
   describe '#deliver_later' do
     it 'enqueues a job to attempt delivery later' do
 

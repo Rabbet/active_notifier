@@ -67,8 +67,13 @@ class ActiveNotifier::Messenger
     @client = self.class.client.new
   end
 
+  def process_event
+    block = self.class.event_handlers[@event]
+    instance_exec(*@arguments, &block)
+  end
+
   def deliver(options = {})
-    self.class.event_handlers[@event].call(*@arguments)
+    process_event
 
     if !self.class.response_handlers.has_key?(@event)
       send_sms(options)
