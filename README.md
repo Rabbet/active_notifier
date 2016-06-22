@@ -42,6 +42,10 @@ class UserMessenger < ActiveNotifier::Messenger
         body: "#{friend_request.from.name} added you on FB4Dogs. Do you accept? YES or NO")
   end
 
+  # If you DO define a response handler, ActiveNotifier will only send one
+  # message to a particular phone number at a time. The others will get queued until
+  # the user responds. Otherwise, there's no way to know WHICH thing they're
+  # responding to.
   on_response_to :friend_request do |response, friend_request|
     if response == 'YES'
       friend_request.approve
@@ -50,6 +54,25 @@ class UserMessenger < ActiveNotifier::Messenger
     end
   end
 end
+
+class UserCaller < ActiveNotifier::Caller
+  default from: '8005551234'
+
+  event :friend_request do |friend_request|
+    call(to: friend_request.to.phone_number) do |call|
+      call.say "Hello, #{friend_request.to.name}. #{friend_request.from.name}
+                added you on FB4Dogs. Would you like to accept? 1 for yes, 2 for no."
+      call.gather timeout: 10, num_digits: 1
+    end
+  end
+
+  on_response_to :friend_request do |response, friend_request|
+    if response == 1
+      friend_request.approve
+    else
+      friend_request.deny
+    end
+  end
 ```
 
 then set up some Notifiers
@@ -79,6 +102,18 @@ options like wait.
 
 ```ruby
 UserMessenger.friend_request(user, possible_friend).deliver_later(wait_until: 10.minutes.from_now)
+```
+
+For the response functionality or phone calls to work, you'll need some web 
+server that accepts the responses. There's one built-in to ActiveNotifier for 
+Rails, but you can build your own (see ActiveNotifier::TwilioMessengerEngine and
+ActiveNotifier::TwilioCallerEngine).
+
+If using Rails and Twilio, just add this to your routes file:
+
+```ruby
+mount ActiveNotifier::TwilioMessengerEngine => '/twilio_messages'
+mount ActiveNotifier::TwilioCallerEngine => '/twilio_calls'
 ```
 
 ## Development
