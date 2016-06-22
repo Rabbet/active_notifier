@@ -68,7 +68,7 @@ class ActiveNotifier::Messenger
   end
 
   def deliver(options = {})
-    self.class.event_handlers[@event].call(@arguments)
+    self.class.event_handlers[@event].call(*@arguments)
 
     if !self.class.response_handlers.has_key?(@event)
       send_sms(options)
