@@ -94,14 +94,14 @@ class ActiveNotifier::Messenger
     @body = options[:body] unless options[:body].nil?
   end
 
-  private
-  def body(message)
-    @response_message = message
-  end
-
   def process_response(response)
     self.class.response_handlers[@event].call(response, *@arguments)
     return @response_message
+  end
+
+  private
+  def response(message)
+    @response_message = message
   end
 
   def send_sms(options)

@@ -6,24 +6,24 @@ describe ActiveNotifier::Notification do
   end
 
   let(:user) { Struct.new(:preferred_contact_methods).new([:sms]) }
-  let(:message) { ActiveNotifier::Messenger.new(:foo) }
+  let(:message) { ActiveNotifier::Messenger.new(:foo, 'fizz', 'buzz') }
 
   before :each do
-    allow(ActiveNotifier::Messenger).to receive(:foo).and_return(message)
+    expect(ActiveNotifier::Messenger).to receive(:foo).with('fizz', 'buzz').at_least(:once).and_return(message)
   end
 
   describe '#deliver_later' do
     context 'user set' do
       it 'calls deliver_later on each of the set notification classes' do
         expect(message).to receive(:deliver_later).once
-        Notifier.foo.for(user).deliver_later
+        Notifier.foo('fizz', 'buzz').for(user).deliver_later
       end
     end
 
     context 'no user set' do
       it 'calls deliver_later on each of the set notification classes' do
         expect(message).to receive(:deliver_later).twice
-        Notifier.foo.deliver_later
+        Notifier.foo('fizz', 'buzz').deliver_later
       end
     end
   end
@@ -31,15 +31,15 @@ describe ActiveNotifier::Notification do
   describe '#deliver' do
     context 'user set' do
       it 'calls deliver on each of the set notification classes' do
-        expect(message).to receive(:deliver_later).once
-        Notifier.foo.for(user).deliver_later
+        expect(message).to receive(:deliver).once
+        Notifier.foo('fizz', 'buzz').for(user).deliver
       end
     end
 
     context 'no user set' do
       it 'calls deliver on each of the set notification classes' do
-        expect(message).to receive(:deliver_later).twice
-        Notifier.foo.deliver_later
+        expect(message).to receive(:deliver).twice
+        Notifier.foo('fizz', 'buzz').deliver
       end
     end
   end
