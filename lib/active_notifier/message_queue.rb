@@ -20,6 +20,10 @@ class ActiveNotifier::MessageQueue
     @client.llen(to_key(phone_number, status))
   end
 
+  def clear
+    @client.flushall
+  end
+
   private
   def to_key(phone_number, status)
     "#{phone_number}:#{status}"

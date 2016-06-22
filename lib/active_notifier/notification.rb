@@ -1,7 +1,7 @@
 class ActiveNotifier::Notification
   def initialize(event, event_options, *args)
     @event = event
-    @event_options = event
+    @event_options = event_options
     @args = args
     @for = nil
   end
@@ -27,9 +27,9 @@ class ActiveNotifier::Notification
   private
   def methods_used
     if @for.nil?
-      notification_options[:via].values
+      @event_options[:methods].values
     else
-      notification_options[:via].select { |method, _| @for.preferred_contact_method.to_sym == method }.values
+      @event_options[:methods].select { |method, _| @for.preferred_contact_method.to_sym == method }.values
     end
   end
 

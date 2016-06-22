@@ -13,4 +13,8 @@ class FakeMessageQueue
   def llen(key)
     self.class.queue[key].length
   end
+
+  def flushall
+    self.class.queue = Hash.new([])
+  end
 end

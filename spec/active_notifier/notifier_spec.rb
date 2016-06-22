@@ -11,7 +11,7 @@ describe ActiveNotifier::Notifier do
 
     context 'has no matching event' do
       it 'raises an error' do
-        expect { subject.does_not_exist }.to raise_error
+        expect { subject.does_not_exist }.to raise_error(NoMethodError)
       end
     end
   end

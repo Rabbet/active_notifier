@@ -5,14 +5,14 @@ class ActiveNotifier::Messenger
 
   cattr_accessor :client, :message_queue
   cattr_reader :default_options
-  attr_reader :event, :to, :from, :body, :arguments
+  attr_reader :event, :to, :from, :body, :arguments, :client, :message_queue
 
   self.client = ActiveNotifier::Clients::SMS
-  self.message_queue = ActiveNotifier::MessageQueue.new
+  self.message_queue = ActiveNotifier::MessageQueue
 
   class << self
     def method_missing(method, *args)
-      if events.has_key?(method)
+      if event_handlers.has_key?(method)
         self.new(method, *args)
       else
         super
@@ -52,14 +52,17 @@ class ActiveNotifier::Messenger
     @body = self.class.default_options[:body]
 
     @arguments = args
+
+    @message_queue = self.class.message_queue.new
+    @client = self.class.client.new
   end
 
   def deliver(options = {})
     self.class.event_handlers[@event].call(@arguments)
 
-    if !self.class.responses.has_key?(@event)
+    if !self.class.response_handlers.has_key?(@event)
       send_sms(options)
-    elsif self.class.message_queue.length(@options[:to], 'awaiting_response') == 0
+    elsif @message_queue.length(@to, 'awaiting_response') == 0
       send_sms(options)
       queue_message('awaiting_response')
     else
@@ -77,7 +80,7 @@ class ActiveNotifier::Messenger
 
   private
   def send_sms(options)
-    self.class.client.send_message(from: @from, to: @to, body: @body)
+    @client.send_message(from: @from, to: @to, body: @body)
   end
 
   def sms(options = {})
@@ -87,7 +90,7 @@ class ActiveNotifier::Messenger
   end
 
   def queue_message(status)
-    self.class.message_queue.push(self, status)
+    @message_queue.push(self, status)
   end
 
   def format_phone_number(phone_number)

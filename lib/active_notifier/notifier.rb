@@ -4,10 +4,6 @@ class ActiveNotifier::Notifier
       events[event] = { methods: via }
     end
 
-    def notifies_via(options = {})
-      @notifies_via = options
-    end
-
     def method_missing(event, *args)
       if events.has_key?(event)
         ActiveNotifier::Notification.new(event, events[event], *args)
