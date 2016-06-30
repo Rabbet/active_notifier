@@ -4,8 +4,12 @@ class ActiveNotifier::Notifier
       events[event] = { methods: via }
     end
 
+    def respond_to_missing?(method_name, include_private = false)
+      events.has_key?(method_name) || super
+    end
+
     def method_missing(event, *args)
-      if events.has_key?(event)
+      if respond_to?(event)
         ActiveNotifier::Notification.new(event, events[event], *args)
       else
         super

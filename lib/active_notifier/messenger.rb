@@ -11,8 +11,12 @@ class ActiveNotifier::Messenger
   self.message_queue = ActiveNotifier::MessageQueue
 
   class << self
+    def respond_to_missing?(method_name, include_private = false)
+      event_handlers.has_key?(method_name) || super
+    end
+
     def method_missing(method, *args)
-      if event_handlers.has_key?(method)
+      if respond_to?(method)
         self.new(method, *args)
       else
         super

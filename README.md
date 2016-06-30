@@ -119,7 +119,22 @@ mount ActiveNotifier::TwilioCaller::Engine => '/twilio_calls'
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
 
+## Releasing
+
+This gem is internal-only right now, so we release through gemfury. If you
+already have a gemfury account, add the remote:
+
+`git remote add fury https://<your-gemfury-username>@git.fury.io/renovatesimply/active_notifier.git`
+
+then update version.rb and `git push fury master`
+
+If you don't have a gemfury account, message someone on the team for an invite.
+
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/RenovateSimply/active_notifier.
 
+## What's up with the name?
+
+Yes, I realize this should probably be *Action*Notifier, but I realized that
+after I'd already started writing ActiveNotifier everywhere.
