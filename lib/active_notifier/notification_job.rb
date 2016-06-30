@@ -1,3 +1,5 @@
+require 'active_job'
+
 class ActiveNotifier::NotificationJob < ActiveJob::Base
   queue_as ActiveNotifier.notification_queue
 

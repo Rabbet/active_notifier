@@ -6,6 +6,7 @@ module ActiveNotifier
   extend ActiveSupport::Autoload
 
   autoload :Notification
+  autoload :NotificationJob
   autoload :Notifier
 
   autoload :Messenger
@@ -18,7 +19,8 @@ module ActiveNotifier
     autoload :Phone, 'active_notifier/clients/phone'
   end
 
-  def notification_queue
-    :normal
+  cattr_accessor :notification_queue
+  def self.notification_queue
+    @notification_queue ||= :normal
   end
 end
