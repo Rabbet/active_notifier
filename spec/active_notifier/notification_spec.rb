@@ -13,14 +13,14 @@ describe ActiveNotifier::Notification do
   end
 
   describe '#deliver_later' do
-    context 'user set' do
+    context 'methods defined' do
       it 'calls deliver_later on each of the set notification classes' do
         expect(message).to receive(:deliver_later).once
-        Notifier.foo('fizz', 'buzz').for(user).deliver_later
+        Notifier.foo('fizz', 'buzz').using(:sms).deliver_later
       end
     end
 
-    context 'no user set' do
+    context 'no methods defined' do
       it 'calls deliver_later on each of the set notification classes' do
         expect(message).to receive(:deliver_later).twice
         Notifier.foo('fizz', 'buzz').deliver_later
@@ -29,14 +29,14 @@ describe ActiveNotifier::Notification do
   end
 
   describe '#deliver' do
-    context 'user set' do
+    context 'methods defined' do
       it 'calls deliver on each of the set notification classes' do
         expect(message).to receive(:deliver).once
-        Notifier.foo('fizz', 'buzz').for(user).deliver
+        Notifier.foo('fizz', 'buzz').using(:sms).deliver
       end
     end
 
-    context 'no user set' do
+    context 'no methods defined' do
       it 'calls deliver on each of the set notification classes' do
         expect(message).to receive(:deliver).twice
         Notifier.foo('fizz', 'buzz').deliver

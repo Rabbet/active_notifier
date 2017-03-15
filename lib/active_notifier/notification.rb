@@ -3,34 +3,42 @@ class ActiveNotifier::Notification
     @event = event
     @event_options = event_options
     @args = args
-    @for = nil
+    @using = @event_options[:methods].values
+    @to = @event_options[:to]
   end
 
-  def for(user)
+  def using(*methods)
     self.tap do
-      @for = user
+      @using = @event_options[:methods].select { |method, _| methods.include? method }.values
+    end
+  end
+
+  def to(obj_or_array)
+    self.tap do
+      @to = obj_or_array
     end
   end
 
   def deliver_later(options = {})
-    methods_used.each do |notification_class|
-      notification_class.send(@event, *@args).deliver_later(options)
-    end
+    notification_classes.each { |klass| klass.deliver_later(options) }
   end
 
   def deliver(options = {})
-    methods_used.each do |notification_class|
-      notification_class.send(@event, *@args).deliver(options)
-    end
+    notification_classes.each { |klass| klass.deliver(options) }
   end
 
   private
-  def methods_used
-    if @for.nil?
-      @event_options[:methods].values
+  def notification_classes
+    if @to.respond_to?(:map)
+      @to.map { |to| notification_classes_for(receiver) }.flatten
     else
-      @event_options[:methods].select { |method, _| @for.preferred_contact_methods.include? method }.values
+      notification_classes_for(@to)
     end
   end
 
+  def notification_classes_for(to)
+    @using.map do |notification_class|
+      notification_class.send(@event, *@args)
+    end
+  end
 end

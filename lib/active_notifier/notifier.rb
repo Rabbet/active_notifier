@@ -1,7 +1,11 @@
 class ActiveNotifier::Notifier
   class << self
+    def default(options={})
+      @default_options = options
+    end
+
     def notifies_on(event, via)
-      events[event] = { methods: via }
+      events[event] = { methods: (default_options[:methods] || {}).merge(via) }
     end
 
     def respond_to_missing?(method_name, include_private = false)
@@ -19,6 +23,10 @@ class ActiveNotifier::Notifier
     private
     def events
       @events ||= {}
+    end
+
+    def default_options
+      @default_options ||= {}
     end
   end
 end
