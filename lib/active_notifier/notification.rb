@@ -38,7 +38,7 @@ class ActiveNotifier::Notification
 
   def notification_classes_for(to)
     @using.map do |notification_class|
-      notification_class.send(@event, *@args)
+      notification_class.send(@event, *@args, to: to)
     end
   end
 end

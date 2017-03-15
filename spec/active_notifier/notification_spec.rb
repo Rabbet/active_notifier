@@ -9,7 +9,7 @@ describe ActiveNotifier::Notification do
   let(:message) { ActiveNotifier::Messenger.new(:foo, 'fizz', 'buzz') }
 
   before :each do
-    expect(ActiveNotifier::Messenger).to receive(:foo).with('fizz', 'buzz').at_least(:once).and_return(message)
+    expect(ActiveNotifier::Messenger).to receive(:foo).with('fizz', 'buzz', to: nil).at_least(:once).and_return(message)
   end
 
   describe '#deliver_later' do
